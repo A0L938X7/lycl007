@@ -1,0 +1,48 @@
+:root{
+  --bg:#0a0a0c; --fg:#c8c8c8; --dim:#5a5a5a;
+  --amber:#c9a227; --red:#8b1a1a; --border:#2a2a2e;
+  --mono:"Courier New","Ui-monospace",monospace;
+  --serif:"Times New Roman",serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--fg);font-family:var(--mono);
+  font-size:14px;line-height:1.75;min-height:100vh;
+  display:flex;justify-content:center;padding:2.5rem 1rem;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:10;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.015) 2px,rgba(255,255,255,.015) 4px);
+}
+#app{width:100%;max-width:700px;position:relative;z-index:2}
+h1{font-family:var(--serif);font-size:1.5rem;font-weight:normal;
+   letter-spacing:.08em;color:#e8e8e8;border-bottom:1px solid var(--border);
+   padding-bottom:.8rem;margin-bottom:.6rem}
+h2{font-size:.95rem;font-weight:normal;color:var(--amber);
+   margin:1.5rem 0 .8rem;letter-spacing:.1em}
+.meta{font-size:.72rem;color:var(--dim);margin-bottom:1.2rem;letter-spacing:.04em}
+.mail{border:1px solid var(--border);padding:1rem 1.2rem;margin-bottom:1.2rem}
+.row{font-size:.8rem;color:var(--dim);margin-bottom:.25rem}
+.row b{color:var(--fg);font-weight:normal}
+.body-empty{font-style:italic;color:var(--dim);font-size:.82rem;
+  padding:.7rem 0;border-top:1px dashed var(--border);
+  border-bottom:1px dashed var(--border);margin:.7rem 0}
+.attach{border:1px solid var(--border);padding:.8rem;margin-top:.6rem;
+  font-size:.8rem;color:var(--amber)}
+.garbled{margin-top:.6rem;color:var(--dim);font-size:.75rem;
+  white-space:pre-wrap;word-break:break-all;font-family:var(--mono)}
+.hint{font-size:.72rem;color:var(--dim);margin-top:.8rem;
+  border-left:2px solid var(--border);padding-left:.8rem}
+.floor{border-left:2px solid var(--border);padding:.5rem 0 .5rem 1rem;margin-bottom:.9rem}
+.tag{font-size:.72rem;color:var(--dim);margin-bottom:.2rem}
+.content{font-size:.86rem;color:#b0b0b0}
+.floor.missing{border-left-color:var(--red);color:var(--red);font-size:.8rem}
+.msg{margin-bottom:.5rem;font-size:.85rem}
+.msg .who{color:var(--amber)}
+pre.txt{background:#050506;border:1px solid var(--border);padding:1rem;
+  font-size:.8rem;color:var(--amber);white-space:pre-wrap;
+  word-break:break-all;margin:1rem 0;font-family:var(--mono)}
+.final{border:1px solid var(--border);padding:1.5rem;margin-top:1.2rem;text-align:center}
+.final.ok{border-color:var(--amber);color:var(--amber)}
+.final.err{border-color:var(--red);color:var(--red)}
+a{color:var(--amber)}
