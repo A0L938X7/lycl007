@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>彼岸BBS · 归档</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main id="app"></main>
+<script>
+const app = document.getElementById('app');
+const code = new URLSearchParams(location.search).get('code');
+
+const header = `
+  <h1>彼岸BBS · 归档事故</h1>
+  <div class="meta">归档操作 · 网络异常事件分析科</div>
+`;
+
+if (code === 'ARCHIVEME') {
+  app.innerHTML = header + `
+    <h2>归档结果</h2>
+    <div class="final ok">
+      <div>归档完成。</div>
+      <div style="margin-top:1rem;">实体状态：已终结。</div>
+      <div style="margin-top:1rem;color:var(--dim);">你的分析员 ID 已被写入第13楼。</div>
+    </div>
+    <p class="hint">报告已提交。听候审核。</p>
+    <p class="hint">提示：终章之后，第13楼不再属于归途。</p>
+  `;
+} else {
+  app.innerHTML = header + `
+    <h2>归档结果</h2>
+    <div class="final err">
+      <div>归档失败。</div>
+      <div style="margin-top:1rem;">实体拒绝被归档。代码不正确或缺失。</div>
+    </div>
+    <p class="hint">最终代码应作为 URL 参数传入。格式：/archive/?code=最终代码</p>
+  `;
+}
+</script>
+</body>
+</html>
