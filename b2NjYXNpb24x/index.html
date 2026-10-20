@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>彼岸BBS · 归档事故</title>
+<style>
+  :root{
+    --bg:#0a0a0c; --fg:#c8c8c8; --dim:#5a5a5a;
+    --amber:#c9a227; --red:#8b1a1a; --border:#2a2a2e;
+    --mono:"Courier New","Ui-monospace",monospace;
+    --serif:"Times New Roman",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg);color:var(--fg);font-family:var(--mono);
+    font-size:14px;line-height:1.75;min-height:100vh;
+    display:flex;justify-content:center;padding:2.5rem 1rem;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:10;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.015) 2px,rgba(255,255,255,.015) 4px);
+  }
+  #app{width:100%;max-width:700px;position:relative;z-index:2}
+  h1{font-family:var(--serif);font-size:1.5rem;font-weight:normal;
+     letter-spacing:.08em;color:#e8e8e8;border-bottom:1px solid var(--border);
+     padding-bottom:.8rem;margin-bottom:.6rem}
+  h2{font-size:.95rem;font-weight:normal;color:var(--amber);
+     margin:1.5rem 0 .8rem;letter-spacing:.1em}
+  .meta{font-size:.72rem;color:var(--dim);margin-bottom:1.2rem;letter-spacing:.04em}
+  .mail{border:1px solid var(--border);padding:1rem 1.2rem;margin-bottom:1.2rem}
+  .row{font-size:.8rem;color:var(--dim);margin-bottom:.25rem}
+  .row b{color:var(--fg);font-weight:normal}
+  .body-empty{font-style:italic;color:var(--dim);font-size:.82rem;
+    padding:.7rem 0;border-top:1px dashed var(--border);
+    border-bottom:1px dashed var(--border);margin:.7rem 0}
+  .attach{border:1px solid var(--border);padding:.8rem;margin-top:.6rem;
+    font-size:.8rem;color:var(--amber)}
+  .garbled{margin-top:.6rem;color:var(--dim);font-size:.75rem;
+    white-space:pre-wrap;word-break:break-all;font-family:var(--mono)}
+  .hint{font-size:.72rem;color:var(--dim);margin-top:.8rem;
+    border-left:2px solid var(--border);padding-left:.8rem}
+  .floor{border-left:2px solid var(--border);padding:.5rem 0 .5rem 1rem;margin-bottom:.9rem}
+  .tag{font-size:.72rem;color:var(--dim);margin-bottom:.2rem}
+  .content{font-size:.86rem;color:#b0b0b0}
+  .floor.missing{border-left-color:var(--red);color:var(--red);font-size:.8rem}
+  .msg{margin-bottom:.5rem;font-size:.85rem}
+  .msg .who{color:var(--amber)}
+  .link{color:var(--amber);text-decoration:underline;text-underline-offset:3px}
+  pre.txt{background:#050506;border:1px solid var(--border);padding:1rem;
+    font-size:.8rem;color:var(--amber);white-space:pre-wrap;
+    word-break:break-all;margin:1rem 0;font-family:var(--mono)}
+  .final{border:1px solid var(--border);padding:1.5rem;margin-top:1.2rem;text-align:center}
+  .final.ok{border-color:var(--amber);color:var(--amber)}
+  .final.err{border-color:var(--red);color:var(--red)}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+const app = document.getElementById('app');
+
+function header(sub){
+  return `<h1>彼岸BBS · 归档事故</h1>
+    <div class="meta">灵异事件密码分析处 · 网络异常事件分析科 · ${sub}</div>`;
+}
+
+function renderInbox(){
+  app.innerHTML = `
+    ${header('终端入口')}
+    <h2>收件箱</h2>
+    <div class="mail">
+      <div class="row">发件人：<b>guitu@bi-an.bbs</b></div>
+      <div class="row">主题：<b>（无）</b></div>
+      <div class="row">发送时间：<b>2003-03-03 03:03:03</b></div>
+      <div class="body-empty">（正文为空）</div>
+      <div class="attach">
+        📎 archive_20030303.txt
+        <pre class="garbled">Gb gur bar jub svaqf guvf:
+gur ragenapr vf va gur HEY.
+#/guebng/404</pre>
+      </div>
+    </div>
+    <p class="hint">附件已损坏。编码标记：ROT13。</p>
+    <p class="hint">解码后得到一个路径。把该路径填入浏览器地址栏（替换 # 之后的部分）。</p>
+  `;
+}
+
+function renderThread(){
+  const raw = "The night watch holds the key. TXT record: #/dns";
+  const b64 = btoa(raw);
+  app.innerHTML = `
+    ${header('帖子视图')}
+    <h2>帖子：我要走了</h2>
+    <div class="meta">作者：归途 · 2003-03-02 23:47 · 回复：12</div>
+    <div class="floor">
+      <div class="tag">1 楼 · 归途</div>
+      <div class="content">我要走了。上传进度87%。如果中断，第13楼会记住我。</div>
+    </div>
+    <div class="floor">
+      <div class="tag">2 楼 · 匿名</div>
+      <div class="content">你在说什么？</div>
+    </div>
+    <div class="floor">
+      <div class="tag">12 楼 · 守夜人 · 2003-03-03 03:01</div>
+      <div class="content">备份已开始。不要关服务器。</div>
+    </div>
+    <div class="floor missing">13 楼 · [ 该楼层未渲染 ]</div>
+    <!--
+      第13楼 Base64：
+      ${b64}
+    -->
+    <p class="hint">第13楼没有显示。但它的数据仍在页面源码中。查看源代码，搜索“第13楼”。</p>
+    <p class="hint">编码：Base64。解码后得到一个 TXT 记录地址。</p>
+  `;
+}
+
+function renderDns(){
+  app.innerHTML = `
+    ${header('DNS 查询')}
+    <h2>bi-an.bbs · TXT 记录</h2>
+    <div class="meta">TTL：-1 · 状态：记录不存在但解析成功</div>
+    <pre class="txt">v=spf1 include:#/bavba -all</pre>
+    <p class="hint">include 字段包含一个路径。编码：ROT13。</p>
+    <p class="hint">解码后把路径填入地址栏。</p>
+  `;
+}
+
+function renderOnion(){
+  const code = String.fromCharCode(65,82,67,72,73,86,69,77,69);
+  const raw = `The final code is ${code}. Append it to the archive URL.`;
+  const b64 = btoa(raw);
+  app.innerHTML = `
+    ${header('匿名会话')}
+    <h2>#/onion · 对端 GuiTu_2003</h2>
+    <div class="meta">连接时间：2003-03-03 03:03:03</div>
+    <div class="msg"><span class="who">[GuiTu]</span> 你终于来了。</div>
+    <div class="msg"><span class="who">[GuiTu]</span> 我等了很久。</div>
+    <div class="msg"><span class="who">[GuiTu]</span> 从2003年开始。</div>
+    <div class="msg"><span class="who">[GuiTu]</span> 火灾那天，上传到87%。</div>
+    <div class="msg"><span class="who">[GuiTu]</span> 我需要你完成剩下的13%。</div>
+    <div class="msg"><span class="who">[GuiTu]</span> 最终代码已发送。它被隐藏了。</div>
+    <!--
+      隐藏消息（Base64）：
+      ${b64}
+    -->
+    <p class="hint">最后一条消息没有被渲染。查看源代码，搜索“隐藏消息”。</p>
+    <p class="hint">编码：Base64。解码后得到最终代码与提交方式。</p>
+    <p class="hint">提交格式：#/archive?code=最终代码</p>
+  `;
+}
+
+function renderArchive(code){
+  if (code === 'ARCHIVEME'){
+    app.innerHTML = `
+      ${header('归档操作')}
+      <h2>归档结果</h2>
+      <div class="final ok">
+        <div>归档完成。</div>
+        <div style="margin-top:1rem;">实体状态：已终结。</div>
+        <div style="margin-top:1rem;color:var(--dim);">你的分析员 ID 已被写入第13楼。</div>
+      </div>
+      <p class="hint">报告已提交。听候审核。</p>
+      <p class="hint">提示：终章之后，第13楼不再属于归途。</p>
+    `;
+  } else {
+    app.innerHTML = `
+      ${header('归档操作')}
+      <h2>归档结果</h2>
+      <div class="final err">
+        <div>归档失败。</div>
+        <div style="margin-top:1rem;">实体拒绝被归档。代码不正确。</div>
+      </div>
+      <p class="hint">最终代码应作为 URL 参数传入。格式：#/archive?code=最终代码</p>
+    `;
+  }
+}
+
+function render404(route){
+  app.innerHTML = `
+    <h1>彼岸BBS · 404</h1>
+    <div class="meta">请求路径：/${route}</div>
+    <h2>页面不存在</h2>
+    <p style="color:var(--dim);">该页面未归档。</p>
+    <p class="hint">返回：<a class="link" href="#/">收件箱</a></p>
+  `;
+}
+
+function render(){
+  const hash = location.hash.slice(1) || '/';
+  const [path, qs] = hash.split('?');
+  const route = path.split('/').filter(Boolean).join('/');
+  const query = {};
+  if (qs){
+    qs.split('&').forEach(p => {
+      const i = p.indexOf('=');
+      const k = i >= 0 ? p.slice(0,i) : p;
+      const v = i >= 0 ? p.slice(i+1) : '';
+      query[decodeURIComponent(k)] = decodeURIComponent(v);
+    });
+  }
+  switch(route){
+    case '': return renderInbox();
+    case 'thread/404': return renderThread();
+    case 'dns': return renderDns();
+    case 'onion': return renderOnion();
+    case 'archive': return renderArchive(query.code || '');
+    default: return render404(route);
+  }
+}
+
+if (!location.hash) location.hash = '#/';
+window.addEventListener('hashchange', render);
+render();
+</script>
+</body>
+</html>
