@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>灵异事件密码分析处 · CAD</title>
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --fg: #c8c8c8;
+    --dim: #5a5a5a;
+    --amber: #c9a227;
+    --red: #8b1a1a;
+    --border: #2a2a2e;
+    --mono: "Courier New", "Ui-monospace", monospace;
+    --serif: "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--mono);
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 2px, rgba(255,255,255,0.012) 2px, rgba(255,255,255,0.012) 4px
+    );
+    pointer-events: none;
+    z-index: 10;
+  }
+  #terminal { width: 100%; max-width: 720px; position: relative; z-index: 2; }
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  .header h1 {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    font-weight: normal;
+    letter-spacing: 0.08em;
+    color: #e8e8e8;
+  }
+  .header .sub {
+    font-size: 0.78rem;
+    color: var(--dim);
+    margin-top: 0.3rem;
+    letter-spacing: 0.12em;
+  }
+  .status-bar {
+    display: flex; gap: 1.2rem; flex-wrap: wrap;
+    font-size: 0.75rem; color: var(--dim);
+    margin-bottom: 2rem; letter-spacing: 0.06em;
+  }
+  .status-bar .tag-suspended { color: var(--red); }
+  .status-bar .tag-active { color: var(--amber); }
+  .case-meta {
+    border: 1px solid var(--border);
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.8rem;
+    color: var(--dim);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem 1.5rem;
+  }
+  .case-meta span { color: var(--fg); }
+  .narrative {
+    margin-bottom: 1.5rem;
+    white-space: pre-wrap;
+    font-size: 0.95rem;
+    color: #b0b0b0;
+    border-left: 2px solid var(--border);
+    padding-left: 1rem;
+  }
+  .cipher-block {
+    background: #050506;
+    border: 1px solid var(--border);
+    padding: 1.2rem 1.4rem;
+    margin: 1.2rem 0 1.5rem;
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    color: var(--amber);
+    word-break: break-all;
+    text-align: center;
+  }
+  .hint {
+    font-size: 0.8rem;
+    color: var(--dim);
+    margin-bottom: 1.5rem;
+    font-style: italic;
+  }
+  .input-row { display: flex; gap: 0.8rem; }
+  input[type="text"] {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--fg);
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    padding: 0.7rem 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+    letter-spacing: 0.08em;
+  }
+  input[type="text"]:focus { border-color: var(--amber); }
+  input[type="text"].error {
+    border-color: var(--red);
+    animation: shake 0.25s;
+  }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)}
+  }
+  button {
+    background: transparent;
+    border: 1px solid var(--amber);
+    color: var(--amber);
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    padding: 0.7rem 1.4rem;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    transition: background 0.2s, color 0.2s;
+  }
+  button:hover { background: var(--amber); color: var(--bg); }
+  .feedback {
+    margin-top: 1rem; font-size: 0.85rem; min-height: 1.4em;
+    letter-spacing: 0.04em;
+  }
+  .feedback.ok { color: var(--amber); }
+  .feedback.err { color: var(--red); }
+  .anomaly {
+    margin-top: 1.8rem; padding-top: 1rem;
+    border-top: 1px dashed var(--border);
+    font-size: 0.75rem; color: var(--dim);
+    letter-spacing: 0.05em;
+    display: none;
+  }
+  .anomaly .stamp { color: var(--red); }
+  .hidden-line {
+    margin-top: 2rem; font-size: 0.75rem; color: var(--dim);
+    opacity: 0; transition: opacity 1.2s;
+    letter-spacing: 0.1em;
+  }
+  .hidden-line.show { opacity: 1; }
+</style>
+</head>
+<body>
+<main id="terminal">
+  <div class="header">
+    <h1>灵异事件密码分析处</h1>
+    <div class="sub">CIPHER ANALYSIS DIVISION · GHOST PROTOCOL / 终端入口</div>
+  </div>
+  <div class="status-bar" id="statusBar"></div>
+  <div id="content"></div>
+</main>
+
+<script>
+/* ============================================================
+   档案数据层
+   扩展方式：向 CASES 数组追加对象，填入对应字段即可。
+   cipherType 与 verify 函数的对应关系见下方 DECODERS。
+   ============================================================ */
+const CASES = [
+  {
+    id: "CAD-01",
+    caseNo: "GH-2026-0147",
+    title: "闭馆后便签",
+    cipherType: "caesar",
+    ciphertext: "GUR YVTUGF NER BA",
+    hint: "位移 13 位。",
+    answer: "THE LIGHTS ARE ON",
+    narrative:
+`档案状态：悬置。
+一名档案员在闭馆后留下一条便签，次日未到岗。
+便签内容已扫描归档。解密是唯一被授权的操作。`,
+    anomaly:
+`系统日志：本条档案的创建时间戳为 2026-10-19 23:41 NZDT。
+解密操作的时间戳为 2026-10-19 23:40 NZDT。
+时间戳矛盾。无法解释。`,
+    hidden: "那条时间戳不会消失。"
+  },
+  /* 后续关卡按同样结构追加：
+     档案 02 维吉尼亚：cipherType: "vigenere", key 字段
+     档案 03 栅栏：cipherType: "railfence", rails 字段
+     档案 04 替换：cipherType: "substitution"
+     档案 05 多层：在 verify 中组合调用即可
+  */
+];
+
+/* ============================================================
+   纯前端解密/验证层
+   只验证玩家答案，不向界面暴露完整解码工具。
+   ============================================================ */
+const DECODERS = {
+  caesar(text, shift = 13) {
+    return text.replace(/[A-Z]/g, c =>
+      String.fromCharCode((c.charCodeAt(0) - 65 - shift + 26) % 26 + 65)
+    );
+  },
+  vigenere(text, key) {
+    const k = key.toUpperCase().replace(/[^A-Z]/g, "");
+    let ki = 0;
+    return text.replace(/[A-Z]/g, c => {
+      const d = (c.charCodeAt(0) - 65 - (k[ki % k.length].charCodeAt(0) - 65) + 26) % 26;
+      ki++;
+      return String.fromCharCode(d + 65);
+    });
+  },
+  railfence(text, rails = 2) {
+    // 简化版：按 rails 栏交错还原
+    const clean = text.replace(/[^A-Z]/g, "");
+    const len = clean.length;
+    const pattern = [];
+    for (let r = 0; r < rails; r++) pattern.push([]);
+    let row = 0, dir = 1;
+    for (let i = 0; i < len; i++) {
+      pattern[row].push(i);
+      if (row === 0) dir = 1;
+      if (row === rails - 1) dir = -1;
+      row += dir;
+    }
+    const out = new Array(len);
+    let idx = 0;
+    for (let r = 0; r < rails; r++) {
+      for (const pos of pattern[r]) out[pos] = clean[idx++];
+    }
+    return out.join("");
+  }
+};
+
+function verify(caseObj, input) {
+  const normalized = input.trim().toUpperCase().replace(/\s+/g, " ");
+  switch (caseObj.cipherType) {
+    case "caesar":
+      return DECODERS.caesar(caseObj.ciphertext) === normalized;
+    case "vigenere":
+      return DECODERS.vigenere(caseObj.ciphertext, caseObj.key) === normalized;
+    case "railfence":
+      return DECODERS.railfence(caseObj.ciphertext, caseObj.rails) === normalized;
+    default:
+      return caseObj.answer === normalized;
+  }
+}
+
+/* ============================================================
+   状态机与渲染
+   ============================================================ */
+const STORAGE_KEY = "cad_progress";
+let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{"current":0,"solved":[]}');
+
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+function render() {
+  const caseObj = CASES[state.current];
+  if (!caseObj) { renderAllSolved(); return; }
+
+  document.getElementById("statusBar").innerHTML = `
+    <span>分析员：见习</span>
+    <span>辖区：奥克兰</span>
+    <span>进度：${state.solved.length} / ${CASES.length}</span>
+    <span class="tag-suspended">档案状态：悬置</span>
+  `;
+
+  document.getElementById("content").innerHTML = `
+    <div class="case-meta">
+      <div>档案编号：<span>${caseObj.caseNo}</span></div>
+      <div>项目代号：<span>${caseObj.id}</span></div>
+      <div>密文类型：<span>${caseObj.cipherType}</span></div>
+      <div>签收状态：<span style="color:var(--red)">未终结</span></div>
+    </div>
+    <div class="narrative">${escapeHTML(caseObj.narrative)}</div>
+    <div class="cipher-block">${caseObj.ciphertext}</div>
+    <div class="hint">提示：${caseObj.hint}</div>
+    <div class="input-row">
+      <input type="text" id="answerInput" placeholder="输入解密结果" autocomplete="off" spellcheck="false">
+      <button id="submitBtn">提交</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div class="anomaly" id="anomaly"></div>
+    <div class="hidden-line" id="hiddenLine"></div>
+  `;
+
+  document.getElementById("submitBtn").addEventListener("click", handleSubmit);
+  document.getElementById("answerInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") handleSubmit();
+  });
+  document.getElementById("answerInput").focus();
+}
+
+function handleSubmit() {
+  const caseObj = CASES[state.current];
+  const input = document.getElementById("answerInput");
+  const fb = document.getElementById("feedback");
+  const anomalyEl = document.getElementById("anomaly");
+  const hiddenEl = document.getElementById("hiddenLine");
+
+  if (!caseObj) return;
+
+  if (verify(caseObj, input.value)) {
+    fb.className = "feedback ok";
+    fb.textContent = "验证通过。档案状态更新中……";
+
+    // 状态栏更新
+    document.querySelector(".tag-suspended").className = "tag-active";
+    document.querySelector(".tag-suspended").textContent = "档案状态：已终结";
+
+    if (caseObj.anomaly) {
+      anomalyEl.style.display = "block";
+      anomalyEl.innerHTML = `<div class="stamp">[ 异常批注 ]</div><div>${escapeHTML(caseObj.anomaly)}</div>`;
+    }
+    if (caseObj.hidden) {
+      hiddenEl.textContent = caseObj.hidden;
+      hiddenEl.classList.add("show");
+    }
+
+    if (!state.solved.includes(caseObj.id)) state.solved.push(caseObj.id);
+    save();
+
+    setTimeout(() => {
+      state.current++;
+      save();
+      render();
+    }, 2800);
+  } else {
+    fb.className = "feedback err";
+    fb.textContent = "验证失败。密文未被终结。";
+    input.classList.add("error");
+    setTimeout(() => input.classList.remove("error"), 400);
+  }
+}
+
+function renderAllSolved() {
+  document.getElementById("statusBar").innerHTML =
+    `<span>进度：${CASES.length} / ${CASES.length}</span><span class="tag-active">全部档案已终结</span>`;
+  document.getElementById("content").innerHTML = `
+    <div class="narrative">所有已归档的密文均已完成验证。
+分析处终端进入待机状态。</div>
+    <div class="hidden-line show" style="color:var(--dim);font-size:0.8rem;margin-top:2rem;">
+      感谢归档。
+    </div>
+  `;
+}
+
+function escapeHTML(s) {
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+render();
+</script>
+</body>
+</html>
